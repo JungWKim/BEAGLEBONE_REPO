@@ -1,0 +1,1 @@
+cmd_/home/ubuntu/workspace/helloWorld/device_driver/hello.ko := ld -r  -EL -T ./scripts/module-common.lds -T ./arch/arm/kernel/module.lds  --build-id  -o /home/ubuntu/workspace/helloWorld/device_driver/hello.ko /home/ubuntu/workspace/helloWorld/device_driver/hello.o /home/ubuntu/workspace/helloWorld/device_driver/hello.mod.o ;  true

@@ -6,8 +6,7 @@
 #include <linux/gpio.h>
 #include <linux/types.h>
 
-#define MAJOR_NUMBER 240
-#define DEVICE_NAME "led"
+#define MAJOR_NUMBER 100
 #define GPIO_OUT_PIN 67
 #define LED_CLEAR 0
 #define LED_SET 1
@@ -28,7 +27,7 @@ int led_release(struct inode *inode, struct file *filp)
 	return 0;
 }
 
-ssize_t led_unlocked_ioctl(struct file *file, unsigned int command, unsigned long argument)
+long led_unlocked_ioctl(struct file *file, unsigned int command, unsigned long argument)
 {
 	switch(command)
 	{
@@ -36,8 +35,13 @@ ssize_t led_unlocked_ioctl(struct file *file, unsigned int command, unsigned lon
 		if(argument == 0)
 		{
 			gpio_set_value(GPIO_OUT_PIN, 0);
-			printk("[DEV] led_ioctl() command: %d, argument: %lf\n", command, argument);
+			printk("[DEV] led_ioctl() command: %d, argument: %ld\n", command, argument);
 		}
+        else if(argument == 1)
+        {
+			gpio_set_value(GPIO_OUT_PIN, 1);
+			printk("[DEV] led_ioctl() command: %d, argument: %ld\n", command, argument);
+        }
 		break;
 
 	default:
@@ -49,23 +53,23 @@ ssize_t led_unlocked_ioctl(struct file *file, unsigned int command, unsigned lon
 
 struct file_operations led_fops = {
 	.open = led_open,
+	.unlocked_ioctl = led_unlocked_ioctl,
 	.release = led_release,
-	.unlocked_ioctl = .led_unlocked_ioctl
 };
 
-int led_init(void)
+static int led_init(void)
 {
 	if(gpio_request(GPIO_OUT_PIN, "LED_TEST") < 0)
 		printk("[DEV] request error\n");
 
-	if(gpio_export(GPIO_OUT_PIN, 1) < 0)
-		printk("[DEV] export error\n");
+    if(gpio_export(GPIO_OUT_PIN, 1) < 0)
+        printk("[DEV] export error\n");
 
 	//use gpio_direction_output() instead of gpio_set_value()
 	if(gpio_direction_output(GPIO_OUT_PIN, 1) != 0)
 		printk("[DEV] direction error\n");
 
-	if(register_chrdev(MAJOR_NUMBER, DEVICE_NAME, &led_fops) < 0)
+	if((register_chrdev(MAJOR_NUMBER, "led", &led_fops)) < 0)
 	{
 		printk("[DEV] LEd initialization failed\n");
 		return -1;
@@ -75,14 +79,14 @@ int led_init(void)
 		printk("[DEV] LED initialization success\n");
 		return 0;
 	}
+    return 0;
 }
 
-int led_exit(void)
+static void led_exit(void)
 {
 	printk("[DEV] LED module closed\n");
 	gpio_free(GPIO_OUT_PIN);
-	unregister_chrdev(MAJOR_NUMBER, DEVICE_NAME);
-	return 0;
+	unregister_chrdev(MAJOR_NUMBER, "led");
 }
 
 module_init(led_init);

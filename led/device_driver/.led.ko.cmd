@@ -1,0 +1,1 @@
+cmd_/home/ubuntu/workspace/led/device_driver/led.ko := ld -r  -EL -T ./scripts/module-common.lds -T ./arch/arm/kernel/module.lds  --build-id  -o /home/ubuntu/workspace/led/device_driver/led.ko /home/ubuntu/workspace/led/device_driver/led.o /home/ubuntu/workspace/led/device_driver/led.mod.o ;  true
