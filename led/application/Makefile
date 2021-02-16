@@ -1,10 +1,15 @@
 .SUFFIXES = .c .o
+
 CC = gcc
+OBJS = ledApp.o
 CFLAGS = -g
 TARGET = ledApp
 
-$(TARGET): $(TARGET).o
+$(TARGET): $(OBJS)
 	gcc -o $@ $<
 
-$(TARGET).o: $(TARGET).c
+$(OBJS): $(TARGET).c
 	gcc -c -o $@ $<
+
+clean:
+	rm -rf $(OBJS) $(TARGET)
