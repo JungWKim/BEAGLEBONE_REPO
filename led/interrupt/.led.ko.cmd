@@ -1,0 +1,1 @@
+cmd_/home/ubuntu/workspace/led/interrupt/led.ko := ld -r  -EL -T ./scripts/module-common.lds -T ./arch/arm/kernel/module.lds  --build-id  -o /home/ubuntu/workspace/led/interrupt/led.ko /home/ubuntu/workspace/led/interrupt/led.o /home/ubuntu/workspace/led/interrupt/led.mod.o ;  true

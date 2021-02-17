@@ -2,14 +2,14 @@
 
 CC = gcc
 OBJS = ledApp.o
-CFLAGS = -g
+CFLAGS = -DLOOP
 TARGET = ledApp
 
 $(TARGET): $(OBJS)
 	gcc -o $@ $<
 
 $(OBJS): $(TARGET).c
-	gcc -c -o $@ $<
+	gcc -c -o $@ $< $(CFLAGS)
 
 clean:
 	rm -rf $(OBJS) $(TARGET)

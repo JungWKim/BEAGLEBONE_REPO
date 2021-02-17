@@ -14,6 +14,11 @@ int main(int argc, char** argv)
         return -1;
     }
 
+#ifdef LOOP
+    while(1)
+    {
+    }
+#else
     for(int i = 0; i<3; i++)
     {
         ioctl(fd, 0, 1);
@@ -22,6 +27,7 @@ int main(int argc, char** argv)
         ioctl(fd, 0, 0);
         sleep(1);
     }
+#endif
 
     close(fd);
     return 0;
