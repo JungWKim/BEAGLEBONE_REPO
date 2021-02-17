@@ -7,13 +7,23 @@
 #include <linux/irq.h>
 #include <linux/interrupt.h>
 
-#define MAJOR_NUMBER 100
-#define GPIO_OUT_PIN 67
-#define GPIO_IN_PIN 44
+#define MAJOR_NUMBER       100
+#define GPIO_OUT_PIN       67
+#define GPIO_IN_PIN        44
 #define GPIO_DEBOUNCE_TIME 100
-#define DEVICE_NAME "led"
-#define LED_CLEAR 0
-#define LED_SET 1
+#define DEVICE_NAME        "led"
+#define LED_CLEAR          0
+#define LED_SET            1
+
+#define GPIO1_START        0x4804c000
+#define GPIO1_END          0x4804cfff
+#define GPIO1_SIZE         (GPIO1_END - GPIO1_START)
+#define GPIO_IRQSTATUS_0   0x2C
+#define GPIO_IRQSTATUS_1   0x30
+#define GPIO_RISINGDETECT  0x148
+
+volatile void __iomem *mem;
+int regval;
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("KJW");
@@ -112,9 +122,29 @@ static int led_init(void)
 
     gpio_irq_num = gpio_to_irq(GPIO_IN_PIN);
     if(request_irq(gpio_irq_num, irq_gpio, 0, "gpio44", NULL) < 0)
-        printk("[DEV] request irq error\n");
+        printk(KERN_ERR "[DEV] request irq error\n");
 
     irq_set_irq_type(gpio_irq_num, IRQ_TYPE_EDGE_RISING);
+
+    if((mem = ioremap(GPIO1_START, GPIO1_SIZE)) <0)
+    {
+        printk(KERN_ERR "[DEV] ioremap error\n");
+        return -1;
+    }
+
+    regval = ioread32(mem + GPIO_IRQSTATUS_0);
+    regval |= (1<<12);
+    iowrite32(regval, mem + GPIO_IRQSTATUS_0);
+
+    regval = ioread32(mem + GPIO_IRQSTATUS_1);
+    regval |= (1<<12);
+    iowrite32(regval, mem + GPIO_IRQSTATUS_1);
+
+    regval = ioread32(mem + GPIO_RISINGDETECT);
+    regval |= (1<<12);
+    iowrite32(regval, mem + GPIO_RISINGDETECT);
+
+    iounmap(mem);
 
     printk("[DEV] LED initialization success\n");
     return 0;
