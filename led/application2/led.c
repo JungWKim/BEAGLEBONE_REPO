@@ -4,17 +4,17 @@
 #include <fcntl.h>
 #include <string.h>
 
-#define GPIO2_BASE        0x44e07000
-#define GPIO2_END         0x44e07fff
-//#define GPIO2_BASE        0x481ac000
-//#define GPIO2_END         0x481acfff
+//#define GPIO2_BASE        0x44e07000
+//#define GPIO2_END         0x44e07fff
+#define GPIO2_BASE        0x481ac000
+#define GPIO2_END         0x481acfff
 #define GPIO_SIZE         (GPIO2_END - GPIO2_BASE)
 #define GPIO_DATAOUT      0x13c
 #define GPIO_OE           0x134
 #define GPIO_CLRDATAOUT   0x190
 #define GPIO_SETDATAOUT   0x194
-#define GPIO67_TOGGLE     (1<<26)
-#define GPIO67_OUT        (0xfffffff & ~(1<<26))
+#define GPIO67_TOGGLE     (1<<3)
+#define GPIO67_OUT        (0xfffffff & ~(1<<3))
 
 volatile unsigned int *gpio_oe;
 volatile unsigned int *gpio_dataout;
@@ -46,7 +46,7 @@ int main(int argc, char **argv)
     gpio_setdataout = (volatile unsigned int*)(gpio2_base + GPIO_SETDATAOUT);
 
 #ifdef DATAOUT
-    *gpio_dataout |= (1<<26);
+    *gpio_dataout |= (1<<3);
     printf("dataout defined\n\n");
 #else
     *gpio_oe &= GPIO67_OUT;
